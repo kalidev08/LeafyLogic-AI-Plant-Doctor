@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Google AI Studio App</title>
+    <script>
+      // Silence benign Vite dev-server HMR websocket connection failures in sandbox environment
+      if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        const OriginalWebSocket = window.WebSocket;
+        class MockWebSocket {
+          constructor(url, protocols) {
+            this.url = url;
+            this.readyState = 3; // CLOSED
+            this.onclose = null;
+            this.onerror = null;
+            this.onmessage = null;
+            this.onopen = null;
+          }
+          addEventListener(type, listener) {}
+          removeEventListener(type, listener) {}
+          close() {}
+          send() {}
+        }
+        window.WebSocket = function(url, protocols) {
+          if (typeof url === 'string' && (url.includes('/vite') || url.includes('hmr') || url.includes('ws:'))) {
+            return new MockWebSocket(url, protocols);
+          }
+          return new OriginalWebSocket(url, protocols);
+        };
+        // Copy over static constants
+        window.WebSocket.CONNECTING = 0;
+        window.WebSocket.OPEN = 1;
+        window.WebSocket.CLOSING = 2;
+        window.WebSocket.CLOSED = 3;
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
